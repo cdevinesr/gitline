@@ -5,14 +5,16 @@ generate_gitline() {
     RED='\[\e[0;31m\]'
     GREEN='\[\e[1;32m\]'
     YELLOW='\[\e[1;33m\]'
+    BLUE='\[\e[1;34m\]'
     WHITE='\[\e[1;37m\]'
     RESET='\[\e[0m\]'
 
     # Statusline creation patterns
-    local DETACHED AHEAD BEHIND PENDING_CHANGES PENDING_COMMIT REBASE REBASE_EDIT UPTODATE DIVERGED ON_BRANCH
+    local DETACHED AHEAD BEHIND UNTRACKED_FILES PENDING_CHANGES STAGED_CHANGES REBASE REBASE_EDIT UPTODATE DIVERGED ON_BRANCH
     DETACHED="HEAD detached at ([^${IFS}]*)"
     AHEAD="is ahead of '.+' by ([0-9]+) commit"
     BEHIND="is behind '.+' by ([0-9]+) commit"
+    UNTRACKED_FILES="Untracked files"
     PENDING_CHANGES="Changes not staged for commit"
     STAGED_CHANGES="Changes to be committed"
     REBASE="rebase in progress; onto ([^${IFS}]*)"
@@ -38,6 +40,16 @@ generate_gitline() {
             git_line="${RED}${BASH_REMATCH[1]}"
         elif [[ "${gstatus}" =~ ${ON_BRANCH} ]]; then
             branch="${GREEN}${BASH_REMATCH[1]}"
+
+
+            if [[ "${gstatus}" =~ ${UNTRACKED_FILES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    branch+="${WHITE}:"
+                fi
+
+                branch+="${BLUE}?"
+            fi
 
             if [[ "${gstatus}" =~ ${STAGED_CHANGES} ]]; then
                 if [ "${branch_state_sep}" -eq 0 ]; then
