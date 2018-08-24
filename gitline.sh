@@ -14,7 +14,7 @@ generate_gitline() {
     AHEAD="is ahead of '.+' by ([0-9]+) commit"
     BEHIND="is behind '.+' by ([0-9]+) commit"
     PENDING_CHANGES="Changes not staged for commit"
-    PENDING_COMMIT="Changes to be committed"
+    STAGED_CHANGES="Changes to be committed"
     REBASE="rebase in progress; onto ([^${IFS}]*)"
     REBASE_EDIT="editing a commit while rebasing branch '([^${IFS}]*)' on '([^${IFS}]*)'."
     UPTODATE="is up[ -]to[ -]date with '.+'"
@@ -22,8 +22,9 @@ generate_gitline() {
     ON_BRANCH="On branch ([^${IFS}]*)"
 
     # Internal statusline management
-    local git_line gstatus branch num_commits
+    local git_line gstatus branch num_commits branch_state_sep
     git_line=""
+    branch_state_sep=0
     gstatus=$(git status 2> /dev/null)
 
     if [[ $? -eq 0 ]]; then
@@ -38,11 +39,21 @@ generate_gitline() {
         elif [[ "${gstatus}" =~ ${ON_BRANCH} ]]; then
             branch="${GREEN}${BASH_REMATCH[1]}"
 
-            if [[ "${gstatus}" =~ ${PENDING_COMMIT} ]]; then
+            if [[ "${gstatus}" =~ ${STAGED_CHANGES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    branch+="${WHITE}:"
+                fi
+
                 branch+="${YELLOW}*"
             fi
 
             if [[ "${gstatus}" =~ ${PENDING_CHANGES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    branch+="${WHITE}:"
+                fi
+
                 branch+="${RED}*"
             fi
 
