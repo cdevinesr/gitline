@@ -52,11 +52,37 @@ generate_gitline() {
                 rebase_commit="${BASH_REMATCH[1]}"
                 git_line="${RED}rebase${WHITE}:${YELLOW}${rebase_commit}"
             fi
+
+            if [[ "${gstatus}" =~ ${UNTRACKED_FILES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    git_line+="${WHITE}:"
+                fi
+
+                git_line+="${BLUE}?"
+            fi
+
+            if [[ "${gstatus}" =~ ${STAGED_CHANGES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    git_line+="${WHITE}:"
+                fi
+
+                git_line+="${YELLOW}*"
+            fi
+
+            if [[ "${gstatus}" =~ ${PENDING_CHANGES} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    git_line+="${WHITE}:"
+                fi
+
+                git_line+="${RED}*"
+            fi
         elif [[ "${gstatus}" =~ ${DETACHED} ]]; then
             git_line="${RED}${BASH_REMATCH[1]}"
         elif [[ "${gstatus}" =~ ${ON_BRANCH} ]]; then
             branch="${GREEN}${BASH_REMATCH[1]}"
-
 
             if [[ "${gstatus}" =~ ${UNTRACKED_FILES} ]]; then
                 if [ "${branch_state_sep}" -eq 0 ]; then
