@@ -11,12 +11,13 @@ generate_gitline() {
     RESET='\[\e[0m\]'
 
     # Statusline creation patterns
-    local DETACHED AHEAD BEHIND UNTRACKED_FILES PENDING_CHANGES STAGED_CHANGES REBASE REBASE_CONFLICT CONFLICTS_NOT_RESOLVED REBASE_ACTION UPTODATE DIVERGED ON_BRANCH
+    local DETACHED AHEAD BEHIND UNTRACKED_FILES PENDING_CHANGES UNMERGED_PATHS STAGED_CHANGES REBASE REBASE_CONFLICT CONFLICTS_NOT_RESOLVED REBASE_ACTION UPTODATE DIVERGED ON_BRANCH
     DETACHED="HEAD detached at ([^${IFS}]*)"
     AHEAD="is ahead of '.+' by ([0-9]+) commit"
     BEHIND="is behind '.+' by ([0-9]+) commit"
     UNTRACKED_FILES="Untracked files"
     PENDING_CHANGES="Changes not staged for commit"
+    UNMERGED_PATHS="Unmerged paths"
     STAGED_CHANGES="Changes to be committed"
     REBASE="rebase in progress; onto ([^${IFS}]*)"
     REBASE_CONFLICT="currently rebasing branch '([^${IFS}]*)' on '([^${IFS}]*)'."
@@ -102,7 +103,14 @@ generate_gitline() {
                 branch+="${YELLOW}*"
             fi
 
-            if [[ "${gstatus}" =~ ${PENDING_CHANGES} ]]; then
+            if [[ "${gstatus}" =~ ${UNMERGED_PATHS} ]]; then
+                if [ "${branch_state_sep}" -eq 0 ]; then
+                    branch_state_sep=1
+                    branch+="${WHITE}:"
+                fi
+
+                branch+="${FLASHRED}*${RESET}"
+            elif [[ "${gstatus}" =~ ${PENDING_CHANGES} ]]; then
                 if [ "${branch_state_sep}" -eq 0 ]; then
                     branch_state_sep=1
                     branch+="${WHITE}:"
