@@ -1,4 +1,6 @@
 generate_gitline() {
+    local IFS=$' \t\n'
+
     # Colors
     local FLASHRED RED LRED GREEN YELLOW WHITE RESET
     FLASHRED='\[\e[5;31m\]'
